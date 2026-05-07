@@ -29,7 +29,10 @@ httpServer.on("request", (req, res) => {
 // captures it in its snapshot and delegates non-socket.io requests to it.
 const io = new Server(httpServer, {
   cors: {
-    origin: dev ? `http://localhost:${port}` : false,
+    origin: dev
+      ? `http://localhost:${port}`
+      : process.env.BETTER_AUTH_URL ?? true,
+    credentials: true,
   },
 });
 
