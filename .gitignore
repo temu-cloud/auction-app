@@ -36,6 +36,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# kiro IDE
+.kiro
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/app/generated/prisma
