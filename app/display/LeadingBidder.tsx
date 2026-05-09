@@ -22,7 +22,7 @@ export default function LeadingBidder({ highestBid }: LeadingBidderProps) {
           >
             <span className="text-4xl">🏆</span>
             <span className="text-3xl font-semibold text-white">
-              Leading: <span className="text-amber-400">{highestBid.bidderName}</span>
+              የጫራታው መሪ: <span className="text-amber-400">{highestBid.bidderName}</span>
             </span>
           </motion.div>
         ) : (
@@ -31,9 +31,9 @@ export default function LeadingBidder({ highestBid }: LeadingBidderProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="text-2xl text-zinc-500"
+            className="text-2xl text-white font-semibold text-center"
           >
-            Waiting for bids...
+            
           </motion.div>
         )}
       </AnimatePresence>

@@ -36,14 +36,14 @@ export async function POST(request: NextRequest) {
     auctionStateManager.resetSession();
   }
 
-  let body: { itemName: string; itemImageUrl?: string; startingPrice: number };
+  let body: { itemName: string; itemImageUrl?: string; startingPrice: number; hostedBy?: string };
   try {
     body = await request.json();
   } catch {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { itemName, itemImageUrl, startingPrice } = body;
+  const { itemName, itemImageUrl, startingPrice, hostedBy } = body;
 
   if (!itemName || typeof itemName !== "string") {
     return Response.json({ error: "itemName is required" }, { status: 400 });
@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
         itemName,
         itemImageUrl: itemImageUrl ?? null,
         startingPrice,
+        hostedBy: hostedBy ?? "",
         status: "ACTIVE",
       },
     });
@@ -78,6 +79,7 @@ export async function POST(request: NextRequest) {
       name: itemName,
       imageUrl: itemImageUrl ?? null,
       startingPrice,
+      hostedBy: hostedBy ?? "",
     },
     dbSession.id
   );

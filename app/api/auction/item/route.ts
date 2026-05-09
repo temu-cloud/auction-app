@@ -24,14 +24,14 @@ export async function PUT(request: NextRequest) {
   const auth_result = await requireOperator();
   if (auth_result.error) return auth_result.error;
 
-  let body: { itemName: string; startingPrice: number; itemImageUrl?: string };
+  let body: { itemName: string; startingPrice: number; itemImageUrl?: string; hostedBy?: string };
   try {
     body = await request.json();
   } catch {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { itemName, startingPrice, itemImageUrl } = body;
+  const { itemName, startingPrice, itemImageUrl, hostedBy } = body;
 
   if (!itemName || typeof itemName !== "string") {
     return Response.json({ error: "itemName is required" }, { status: 400 });
@@ -48,6 +48,7 @@ export async function PUT(request: NextRequest) {
     name: itemName,
     imageUrl: itemImageUrl ?? null,
     startingPrice,
+    hostedBy: hostedBy ?? "",
   });
 
   // Broadcast updated state to all connected clients so display + preview refresh

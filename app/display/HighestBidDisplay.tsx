@@ -10,15 +10,15 @@ interface HighestBidDisplayProps {
 
 export default function HighestBidDisplay({ highestBid, startingPrice }: HighestBidDisplayProps) {
   const displayAmount = highestBid ? highestBid.amount : startingPrice;
-  const label = highestBid ? "Current Bid" : "Starting Price";
+  const label = highestBid ? "" : "";
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-4">
+    <div className="flex flex-col items-center justify-center">
       <motion.div
         key={label}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="text-3xl font-semibold text-zinc-400 uppercase tracking-wider"
+        className="text-3xl font-bold text-white  tracking-wider"
       >
         {label}
       </motion.div>
@@ -28,14 +28,10 @@ export default function HighestBidDisplay({ highestBid, startingPrice }: Highest
         animate={{ scale: [1, 1.15, 1] }}
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="font-bold text-amber-400"
-        style={{ fontSize: "min(25vh, clamp(4rem, 15vw, 12rem))" }}
+style={{ fontSize: "min(20vh, clamp(3rem, 12vw, 10rem))" }}
       >
-        {displayAmount.toLocaleString("en-US", {
-          style: "currency",
-          currency: "USD",
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        })}
+        {displayAmount}
+      ብር
       </motion.div>
     </div>
   );

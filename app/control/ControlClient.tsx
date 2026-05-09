@@ -18,7 +18,7 @@ interface ControlClientProps {
 
 const DEFAULT_STATE: AuctionState = {
   phase: 'idle', sessionId: null,
-  item: { name: '', imageUrl: null, startingPrice: 0 },
+  item: { name: '', imageUrl: null, startingPrice: 0, hostedBy: '' },
   bids: [], highestBid: null, sidebarVisible: false,
   timer: { status: 'stopped', durationSeconds: 0, remainingSeconds: 0, startedAt: null },
   winner: null,
@@ -64,7 +64,12 @@ export default function ControlClient({ user }: ControlClientProps) {
     try {
       const res = await fetch('/api/auction/session', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemName: item.name, itemImageUrl: item.imageUrl ?? undefined, startingPrice: item.startingPrice }),
+        body: JSON.stringify({ 
+          itemName: item.name, 
+          itemImageUrl: item.imageUrl ?? undefined, 
+          startingPrice: item.startingPrice,
+          hostedBy: item.hostedBy ?? undefined,
+        }),
       })
       if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error ?? 'Failed') }
       toast.success('Auction started!')
@@ -75,6 +80,15 @@ export default function ControlClient({ user }: ControlClientProps) {
 
   function handleEndAuction() { if (socket) socket.emit('auction:end') }
   function handleSidebarToggle() { if (socket) socket.emit('sidebar:toggle', { visible: !auctionState.sidebarVisible }) }
+  async function handleStopCelebration() {
+    try {
+      const res = await fetch('/api/auction/reset', { method: 'POST' })
+      if (!res.ok) throw new Error('Reset failed')
+      toast.success('Display reset')
+    } catch {
+      toast.error('Failed to reset display')
+    }
+  }
   async function handleSignOut() { await signOut(); window.location.href = '/login' }
 
   const isActive = auctionState.phase === 'active'
@@ -90,14 +104,14 @@ export default function ControlClient({ user }: ControlClientProps) {
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-zinc-950 text-zinc-100 flex flex-col">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col">
       <Toaster position="top-right" toastOptions={{ style: { background: '#18181b', color: '#f4f4f5', border: '1px solid #3f3f46' } }} />
 
       {/* Header */}
-      <header className="flex  items-center justify-between px-4 py-2 bg-zinc-900 border-b border-zinc-800 shrink-0">
-        <div className='w-60'></div>
-        <div className="flex items-center gap-3">
-          <h1 className="text-base font-bold text-amber-400">Auction Control</h1>
+      <header className="flex items-center justify-between px-3 py-2 bg-zinc-900 border-b border-zinc-800 shrink-0 gap-2">
+        <div className="hidden lg:block w-40" />
+        <div className="flex items-center gap-2 flex-wrap justify-center">
+          <h1 className="text-sm font-bold text-amber-400">Auction Control</h1>
           <span className={`flex items-center gap-1 text-xs font-medium ${connected ? 'text-green-400' : 'text-red-400'}`}>
             <span className={`w-2 h-2 rounded-full ${connected ? 'bg-green-400' : 'bg-red-400'}`} />
             {connected ? 'Live' : 'Offline'}
@@ -106,18 +120,18 @@ export default function ControlClient({ user }: ControlClientProps) {
             {isActive ? 'LIVE' : isEnded ? 'ENDED' : 'IDLE'}
           </span>
         </div>
-        <div className="flex items-center gap-3">
-          <Link href="/display" className="text-xs text-zinc-400 hover:text-zinc-200">→ Display</Link>
-          <p className="text-xs text-zinc-400 hidden sm:block">{user.name}</p>
-          <button onClick={handleSignOut} className="text-xs text-zinc-500 hover:text-red-400 px-2 py-1 rounded border border-zinc-700">Sign Out</button>
+        <div className="flex items-center gap-2">
+          <Link href="/display" className="text-xs text-zinc-400 hover:text-zinc-200 whitespace-nowrap">→ Display</Link>
+          <p className="text-xs text-zinc-400 hidden sm:block truncate max-w-24">{user.name}</p>
+          <button onClick={handleSignOut} className="text-xs text-zinc-500 hover:text-red-400 px-2 py-1 rounded border border-zinc-700 whitespace-nowrap">Sign Out</button>
         </div>
       </header>
 
-      {/* Body: 3 columns */}
-      <div className="flex justify-between overflow-hidden">
+      {/* Body: stacks on mobile, 3 columns on large screens */}
+      <div className="flex flex-col lg:flex-row lg:flex-1 lg:overflow-hidden">
 
-        {/* COL 1: Item setup + auction buttons (240px) */}
-        <div className="w-80 shrink-0 flex flex-col gap-2 p-2 border-r border-zinc-800 overflow-y-auto">
+        {/* COL 1: Item setup + auction buttons */}
+        <div className="lg:w-80 lg:shrink-0 flex flex-col gap-2 p-3 border-b lg:border-b-0 lg:border-r border-zinc-800 lg:overflow-y-auto">
           <ItemSetupForm currentItem={auctionState.item} onItemUpdated={() => {}} phase={auctionState.phase} />
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3 space-y-2">
@@ -139,26 +153,33 @@ export default function ControlClient({ user }: ControlClientProps) {
             <button onClick={handleSidebarToggle} disabled={!socket} className="w-full rounded-lg bg-zinc-700 hover:bg-zinc-600 disabled:bg-zinc-800 text-zinc-100 disabled:text-zinc-500 font-semibold py-2 text-sm transition-colors">
               {auctionState.sidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
             </button>
+            <button
+              onClick={handleStopCelebration}
+              disabled={!socket}
+              className="w-full rounded-lg bg-rose-900 hover:bg-rose-800 disabled:bg-zinc-800 text-rose-100 disabled:text-zinc-500 font-semibold py-2 text-sm transition-colors cursor-pointer"
+            >
+              ⏹ Stop &amp; Reset Display
+            </button>
           </div>
         </div>
 
-        {/* COL 2: Preview (compact) + Bid Form (flex-1) */}
-        <div className="flex flex-col gap-2 p-2 border-r border-zinc-800 overflow-y-auto w-100">
-          <DisplayPreview  state={auctionState} />
+        {/* COL 2: Preview + Bid Form */}
+        <div className="flex flex-col gap-2 p-3 border-b lg:border-b-0 lg:border-r border-zinc-800 lg:overflow-y-auto lg:flex-1">
+          <DisplayPreview state={auctionState} />
           {isEnded && auctionState.winner && (
             <div className="bg-amber-950/40 border border-amber-800 rounded-xl p-3">
-              <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">Winner</p>
+              <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">የጫራታው አሸናፊ</p>
               <p className="text-base font-bold text-white">{auctionState.winner.bidderName}</p>
               <p className="text-lg font-bold text-amber-400">
-                {auctionState.winner.amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                {auctionState.winner.amount.toLocaleString()} ብር
               </p>
             </div>
           )}
-          <BidForm socket={socket} highestBid={auctionState.highestBid?.amount ?? null} auctionActive={isActive} />
+          <BidForm socket={socket} highestBid={auctionState.highestBid?.amount ?? null} startingPrice={auctionState.item.startingPrice} auctionActive={isActive} />
         </div>
 
-        {/* COL 3: Timer + User management (240px) */}
-        <div className="flex flex-col gap-2 p-2 overflow-y-auto">
+        {/* COL 3: Timer + User management */}
+        <div className="flex flex-col gap-2 p-3 lg:w-110 lg:overflow-y-auto">
           <TimerControls socket={socket} timerStatus={auctionState.timer.status} remainingSeconds={auctionState.timer.remainingSeconds} />
           {isSuperOperator && <UserRoleManager />}
         </div>

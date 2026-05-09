@@ -18,6 +18,7 @@ export interface AuctionState {
     name: string;
     imageUrl: string | null;
     startingPrice: number;
+    hostedBy: string;
   };
   bids: BidRecord[]; // ordered oldest → newest
   highestBid: BidRecord | null;
@@ -41,6 +42,7 @@ function createDefaultState(): AuctionState {
       name: "",
       imageUrl: null,
       startingPrice: 0,
+      hostedBy: "",
     },
     bids: [],
     highestBid: null,
@@ -65,7 +67,7 @@ export class AuctionStateManager {
    * 'active'.
    */
   startSession(
-    item: { name: string; imageUrl: string | null; startingPrice: number },
+    item: { name: string; imageUrl: string | null; startingPrice: number; hostedBy: string },
     sessionId: string
   ): void {
     this.state = {
@@ -83,6 +85,15 @@ export class AuctionStateManager {
       },
       winner: null,
     };
+  }
+
+  /**
+   * Full reset — clears everything including the item, returning to the
+   * true initial state. Used by the "Stop & Reset Display" button so all
+   * connected clients return to the first screen.
+   */
+  fullReset(): void {
+    this.state = createDefaultState();
   }
 
   /**
@@ -229,13 +240,14 @@ export class AuctionStateManager {
   }
 
   /**
-   * Update the current item's name, image URL, and starting price in-memory.
+   * Update the current item's name, image URL, starting price, and host in-memory.
    * Callers are responsible for persisting the change to the DB.
    */
   updateItem(item: {
     name: string;
     imageUrl: string | null;
     startingPrice: number;
+    hostedBy: string;
   }): void {
     this.state = {
       ...this.state,
@@ -329,6 +341,7 @@ export class AuctionStateManager {
         name: session.itemName,
         imageUrl: session.itemImageUrl ?? null,
         startingPrice: session.startingPrice,
+        hostedBy: (session as { hostedBy?: string }).hostedBy ?? "",
       },
       bids,
       highestBid,

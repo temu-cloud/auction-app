@@ -34,8 +34,7 @@ export default function BidBurst({ bid, onComplete }: BidBurstProps) {
   if (!bid) return null;
 
   const formattedAmount = bid.amount.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
+ 
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   });

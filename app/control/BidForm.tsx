@@ -7,12 +7,16 @@ import type { Socket } from 'socket.io-client'
 interface BidFormProps {
   socket: Socket | null
   highestBid: number | null
+  startingPrice: number
   auctionActive: boolean
 }
 
-export default function BidForm({ socket, highestBid, auctionActive }: BidFormProps) {
+export default function BidForm({ socket, highestBid, startingPrice, auctionActive }: BidFormProps) {
   const [bidderName, setBidderName] = useState('')
-  const [amount, setAmount] = useState<number | ''>('')
+  const [increment, setIncrement] = useState<number | ''>('')
+
+  const currentBase = highestBid !== null ? highestBid : startingPrice
+  const previewAmount = increment !== '' && increment > 0 ? currentBase + increment : null
 
   // Listen for bid:rejected events and show error toast
   useEffect(() => {
@@ -35,8 +39,8 @@ export default function BidForm({ socket, highestBid, auctionActive }: BidFormPr
       toast.error('Bidder name is required')
       return
     }
-    if (amount === '' || amount <= 0) {
-      toast.error('Bid amount must be greater than zero')
+    if (increment === '' || increment <= 0) {
+      toast.error('Increment must be greater than zero')
       return
     }
     if (!socket) {
@@ -48,14 +52,16 @@ export default function BidForm({ socket, highestBid, auctionActive }: BidFormPr
       return
     }
 
+    const totalAmount = currentBase + Number(increment)
+
     socket.emit('bid:add', {
       bidderName: bidderName.trim(),
-      amount: Number(amount),
+      amount: totalAmount,
     })
 
     // Optimistically clear the form
     setBidderName('')
-    setAmount('')
+    setIncrement('')
   }
 
   return (
@@ -64,14 +70,12 @@ export default function BidForm({ socket, highestBid, auctionActive }: BidFormPr
         <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">
           Add Bid
         </h2>
-        {highestBid !== null && (
-          <span className="text-xs text-zinc-500">
-            Current highest:{' '}
-            <span className="text-amber-400 font-semibold">
-              {highestBid.toLocaleString()}
-            </span>
+        <span className="text-xs text-zinc-500">
+          Base:{' '}
+          <span className="text-amber-400 font-semibold">
+            {currentBase.toLocaleString()} ብር
           </span>
-        )}
+        </span>
       </div>
 
       {!auctionActive && (
@@ -96,27 +100,28 @@ export default function BidForm({ socket, highestBid, auctionActive }: BidFormPr
           />
         </div>
 
-        {/* Bid Amount */}
+        {/* Increment Amount */}
         <div className="space-y-1">
-          <label htmlFor="bid-amount" className="block text-xs font-medium text-zinc-400">
-            Bid Amount
+          <label htmlFor="bid-increment" className="block text-xs font-medium text-zinc-400">
+            Add Amount (increment)
           </label>
           <input
-            id="bid-amount"
+            id="bid-increment"
             type="number"
             min={1}
             step="any"
-            value={amount}
+            value={increment}
             onChange={(e) =>
-              setAmount(e.target.value === '' ? '' : Number(e.target.value))
+              setIncrement(e.target.value === '' ? '' : Number(e.target.value))
             }
-            placeholder={
-              highestBid !== null
-                ? `> ${highestBid.toLocaleString()}`
-                : 'Enter amount'
-            }
+            placeholder="e.g. 500"
             className="w-full rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
           />
+          {previewAmount !== null && (
+            <p className="text-xs text-green-400 font-semibold">
+              Total bid: {previewAmount.toLocaleString()} ብር
+            </p>
+          )}
         </div>
 
         <button

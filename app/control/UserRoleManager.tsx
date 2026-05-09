@@ -105,11 +105,7 @@ export default function UserRoleManager() {
               </div>
 
               {/* Current role badge */}
-              <span
-                className={`text-xs font-medium ${ROLE_COLORS[user.role as Role] ?? 'text-zinc-400'} hidden sm:block`}
-              >
-                {ROLE_LABELS[user.role as Role] ?? user.role}
-              </span>
+            
 
               {/* Role selector */}
               <select

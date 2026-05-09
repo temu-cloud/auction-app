@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { BidRecord } from "@/lib/auction-state";
+import { ArrowRight, Crown } from "lucide-react";
 
 interface LeaderBannerProps {
   highestBid: BidRecord | null;
@@ -59,7 +60,9 @@ export default function LeaderBanner({
   };
 
   return (
-    <div className="text-center w-full py-4">
+    <div className=" flex items-center justify-center text-center w-full py-2">
+      <span className="text-6xl text-green-400 font-bold">የጫራታው መሪ  </span>
+       <span className="text-6xl text-green-400 font bold"><ArrowRight size={50} /></span>
       <AnimatePresence mode="wait">
         {highestBid ? (
           <motion.div
@@ -72,13 +75,13 @@ export default function LeaderBanner({
             {/* Glow ring wrapper — re-keyed on each leader change to re-trigger animation */}
             <motion.div
               key={`glow-${glowKey.current}`}
-              className="inline-block rounded-2xl px-8 py-3"
+              className="inline-block bg-yellow-500/20 rounded-2xl px-3 py-1"
               variants={glowVariants}
               initial="idle"
               animate={leaderChanged ? "pulse" : "idle"}
             >
-              <span className="text-5xl font-bold text-amber-400">
-                👑 {highestBid.bidderName}
+              <span className="text-6xl font-bold text-green-400   flex gap-2">
+                 {highestBid.bidderName}<Crown size={38} className="text-yellow-500" />
               </span>
             </motion.div>
           </motion.div>
@@ -90,9 +93,7 @@ export default function LeaderBanner({
             animate="animate"
             exit="exit"
           >
-            <span className="text-2xl text-zinc-500 italic">
-              Waiting for first bid...
-            </span>
+   
           </motion.div>
         )}
       </AnimatePresence>

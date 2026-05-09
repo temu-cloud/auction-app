@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
 interface ItemSetupFormProps {
-  currentItem?: { name: string; imageUrl: string | null; startingPrice: number }
+  currentItem?: { name: string; imageUrl: string | null; startingPrice: number; hostedBy: string }
   onItemUpdated?: () => void
   phase?: 'idle' | 'active' | 'ended'
 }
@@ -12,20 +12,19 @@ interface ItemSetupFormProps {
 export default function ItemSetupForm({ currentItem, onItemUpdated, phase }: ItemSetupFormProps) {
   const [itemName, setItemName] = useState(currentItem?.name ?? '')
   const [startingPrice, setStartingPrice] = useState<number | ''>(currentItem?.startingPrice ?? '')
+  const [hostedBy, setHostedBy] = useState(currentItem?.hostedBy ?? '')
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isEnded = phase === 'ended'
 
-  // Sync fields when currentItem changes from server (e.g. after reset or reconnect)
-  // Use JSON stringify to detect deep changes reliably
   const currentItemKey = JSON.stringify(currentItem)
   useEffect(() => {
-    // When phase transitions to ended or idle, clear the form so operator enters fresh item details
     if (phase === 'ended' || (phase === 'idle' && !currentItem?.name)) {
       setItemName('')
       setStartingPrice('')
+      setHostedBy('')
       setImageFile(null)
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
@@ -33,6 +32,7 @@ export default function ItemSetupForm({ currentItem, onItemUpdated, phase }: Ite
     if (currentItem && currentItem.name) {
       setItemName(currentItem.name)
       setStartingPrice(currentItem.startingPrice === 0 ? '' : currentItem.startingPrice)
+      setHostedBy(currentItem.hostedBy ?? '')
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentItemKey, phase])
@@ -78,6 +78,7 @@ export default function ItemSetupForm({ currentItem, onItemUpdated, phase }: Ite
         body: JSON.stringify({
           itemName: itemName.trim(),
           startingPrice: Number(startingPrice),
+          hostedBy: hostedBy.trim(),
           ...(itemImageUrl !== undefined && { itemImageUrl }),
         }),
       })
@@ -105,19 +106,31 @@ export default function ItemSetupForm({ currentItem, onItemUpdated, phase }: Ite
 
       <form onSubmit={handleSubmit} className="space-y-2">
         <div className="space-y-1">
-          <label htmlFor="item-name" className="block text-xs font-medium text-zinc-400">Item Name</label>
+          <label htmlFor="item-name" className="block text-xs font-medium text-zinc-400">የእቃው ስም</label>
           <input
             id="item-name"
             type="text"
             value={itemName}
             onChange={(e) => setItemName(e.target.value)}
-            placeholder="e.g. Vintage Watch"
+            placeholder="የሚጫረተውን እቃ ስም ያስገቡ"
             className="w-full rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
           />
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="starting-price" className="block text-xs font-medium text-zinc-400">Starting Price</label>
+          <label htmlFor="hosted-by" className="block text-xs font-medium text-zinc-400">የጫራታው ባለቤት</label>
+          <input
+            id="hosted-by"
+            type="text"
+            value={hostedBy}
+            onChange={(e) => setHostedBy(e.target.value)}
+            placeholder="ስም/campany"
+            className="w-full rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="starting-price" className="block text-xs font-medium text-zinc-400">መነሻ ዋጋ</label>
           <input
             id="starting-price"
             type="number"
@@ -132,7 +145,7 @@ export default function ItemSetupForm({ currentItem, onItemUpdated, phase }: Ite
 
         <div className="space-y-1">
           <label htmlFor="item-image" className="block text-xs font-medium text-zinc-400">
-            Image <span className="text-zinc-600">(optional)</span>
+           ፎቶ/Image <span className="text-zinc-600">(optional)</span>
           </label>
           <input
             id="item-image"

@@ -65,6 +65,7 @@ model AuctionSession {
   itemName      String
   itemImageUrl  String?
   startingPrice Float
+  hostedBy      String        @default("")
   status        AuctionStatus @default(ACTIVE)
   startedAt     DateTime      @default(now())
   endedAt       DateTime?

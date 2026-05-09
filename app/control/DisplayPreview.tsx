@@ -6,7 +6,7 @@ interface DisplayPreviewProps {
   state: AuctionState
 }
 
-const SCALE = 0.22
+const SCALE = 0.38
 const VIRTUAL_W = 1280
 const VIRTUAL_H = 720
 
@@ -25,10 +25,12 @@ function getBidRowStyle(index: number): React.CSSProperties {
       color: '#fde047',
     }
   }
+ 
   return {
-    background: 'rgba(39,39,42,0.5)',
-    border: '1px solid #3f3f46',
-    color: '#a1a1aa',
+    background: 'rgba(69, 22, 6, 0.5)',
+    border: '1px solid #f90505ff',
+    color: '#f9fafae7',
+ 
   }
 }
 
@@ -38,9 +40,9 @@ export default function DisplayPreview({ state }: DisplayPreviewProps) {
   // Newest-first, capped at 8 for preview
   const displayBids = [...bids].reverse().slice(0, 8)
   const displayAmount = highestBid
-    ? highestBid.amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 })
-    : item.startingPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 })
-  const bidLabel = highestBid ? 'Current Bid' : 'Starting Price'
+    ? highestBid.amount.toLocaleString()
+    : item.startingPrice.toLocaleString('en-US', {   minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  const bidLabel = highestBid ? 'የጫራታው አሁናዊ ዋጋ' : 'የጫራታው መነሻ ዋጋ'
 
   const showTimer = timer.status !== 'stopped'
   const showWinner = phase === 'ended'
@@ -89,7 +91,7 @@ export default function DisplayPreview({ state }: DisplayPreviewProps) {
                 gap: 24,
               }}
             >
-              <div style={{ fontSize: 72, fontWeight: 700, color: '#fbbf24' }}>🏆 WINNER! 🏆</div>
+              <div style={{ fontSize: 72, fontWeight: 700, color: '#fbbf24' }}>🏆 የጫራታው አሸናፊ! 🏆</div>
               {winner ? (
                 <>
                   <div style={{ fontSize: 110, fontWeight: 800, color: '#fff', filter: 'drop-shadow(0 0 20px #fbbf24)' }}>
@@ -132,14 +134,14 @@ export default function DisplayPreview({ state }: DisplayPreviewProps) {
                   )}
                   <div style={{ fontSize: 52, fontWeight: 700, color: '#fff', textAlign: 'center' }}>{item.name}</div>
                   <div style={{ fontSize: 36, color: '#fbbf24', fontWeight: 600 }}>
-                    Starting: {item.startingPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                    መነሻ ዋጋ: {item.startingPrice.toLocaleString('en-US', {  minimumFractionDigits: 0, maximumFractionDigits: 0 })} ብር
                   </div>
-                  <div style={{ fontSize: 24, color: '#52525b', marginTop: 8 }}>Ready to start auction</div>
+                  <div style={{ fontSize: 34, color: '#1adc55ff', marginTop: 8 }}>ጫራታው ሊጀመር ነው!!</div>
                 </>
               ) : (
                 <>
                   <div style={{ fontSize: 60, color: '#3f3f46' }}>🏷️</div>
-                  <div style={{ fontSize: 32, color: '#52525b', fontWeight: 600 }}>Set an item to begin</div>
+                  <div style={{ fontSize: 32, color: '#1adc55ff', fontWeight: 600 }}>የጫራታውን አይነት ያስገቡ!!</div>
                 </>
               )}
             </div>
@@ -153,8 +155,8 @@ export default function DisplayPreview({ state }: DisplayPreviewProps) {
                 justifyContent: 'center',
                 height: '100%',
                 background: timer.remainingSeconds < 10
-                  ? 'linear-gradient(135deg, #450a0a, #09090b, #000)'
-                  : 'linear-gradient(135deg, #451a03, #09090b, #000)',
+                  ? 'linear-gradient(135deg, #450a0a, #119434ff, #062c0fff)'
+                  : 'linear-gradient(135deg, #451a03, #119434ff, #062c0fff)',
                 gap: 16,
               }}
             >
@@ -196,8 +198,8 @@ export default function DisplayPreview({ state }: DisplayPreviewProps) {
                       {item.name}
                     </span>
                   ) : (
-                    <span style={{ fontSize: 24, color: '#52525b', fontStyle: 'italic' }}>
-                      Waiting for first bid...
+                    <span style={{ fontSize: 24, color: '#18e147ff', fontStyle: 'italic' }}>
+                     የጫራታው መሪ
                     </span>
                   )}
                 </div>
@@ -218,7 +220,7 @@ export default function DisplayPreview({ state }: DisplayPreviewProps) {
                     {bidLabel}
                   </div>
                   <div style={{ color: '#fbbf24', fontSize: 120, fontWeight: 800, lineHeight: 1 }}>
-                    {displayAmount}
+                    {displayAmount}ብር
                   </div>
                 </div>
 
@@ -235,8 +237,8 @@ export default function DisplayPreview({ state }: DisplayPreviewProps) {
                   }}
                 >
                   {displayBids.length === 0 ? (
-                    <div style={{ color: '#52525b', fontSize: 24, margin: 'auto' }}>
-                      Waiting for bids...
+                    <div style={{ color: '#11d111ff', fontSize: 24, margin: 'auto' }}>
+                     ይጫረቱ ያሸንፉ
                     </div>
                   ) : (
                     displayBids.map((bid, index) => (
@@ -252,7 +254,7 @@ export default function DisplayPreview({ state }: DisplayPreviewProps) {
                       >
                         <span style={{ fontSize: 20, fontWeight: 600 }}>{bid.bidderName}</span>
                         <span style={{ fontSize: 22, fontWeight: 700 }}>
-                          {bid.amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                          {bid.amount.toLocaleString('en-US', {  minimumFractionDigits: 0, maximumFractionDigits: 0 })}ብር
                         </span>
                       </div>
                     ))
@@ -273,6 +275,8 @@ export default function DisplayPreview({ state }: DisplayPreviewProps) {
                     background: '#18181b',
                   }}
                 >
+                  <span className='text-green-400 font-bold'>{item.hostedBy}</span>
+                  
                   {item.imageUrl && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -284,10 +288,10 @@ export default function DisplayPreview({ state }: DisplayPreviewProps) {
                   <div style={{ color: '#fff', fontSize: 24, fontWeight: 700 }}>{item.name}</div>
                   <div>
                     <div style={{ color: '#71717a', fontSize: 14, textTransform: 'uppercase', letterSpacing: 2 }}>
-                      Starting Price
+                      መነሻ ዋጋ ፡ 
                     </div>
                     <div style={{ color: '#fbbf24', fontSize: 32, fontWeight: 700 }}>
-                      {item.startingPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      {item.startingPrice.toLocaleString('en-US', {   minimumFractionDigits: 0, maximumFractionDigits: 0 })} ብር
                     </div>
                   </div>
                 </div>

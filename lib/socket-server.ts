@@ -118,6 +118,12 @@ export function setupSocketServer(io: Server): void {
       io.emit("sidebar:state", { visible });
     });
 
+    socket.on("auction:full-reset", () => {
+      // Clears everything including item — returns all clients to first screen
+      auctionStateManager.fullReset();
+      io.emit("auction:reset", auctionStateManager.getState());
+    });
+
     socket.on("auction:reset", () => {
       auctionStateManager.resetSession();
       io.emit("auction:reset", auctionStateManager.getState());
