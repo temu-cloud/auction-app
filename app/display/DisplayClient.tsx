@@ -135,7 +135,7 @@ export default function DisplayClient() {
           loop
           muted
           playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-100 pointer-events-none z-0"
+          className="absolute inset-0 w-full h-full object-cover opacity-100 pointer-events-none z-[1] brightness-125 contrast-110 saturate-150"
         >
           <source src="https://res.cloudinary.com/dpdzihcnp/video/upload/v1778495276/lionroar_i9cq3l.mp4" type="video/mp4" />
         </video>
@@ -224,7 +224,7 @@ export default function DisplayClient() {
       {/* ── Main bidding layout ── */}
       {!auctionEnded && !showDefaultIdle && !showItemPreview && (
       <div
-        className={`relative z-0 flex flex-1 flex-col overflow-hidden transition-all duration-300 ${
+        className={`relative z-10 flex flex-1 flex-col overflow-hidden transition-all duration-300 ${
           state.sidebarVisible ? "mr-80" : ""
         }`}
       >
