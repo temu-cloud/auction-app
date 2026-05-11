@@ -262,7 +262,7 @@ export default function DisplayClient() {
 
       {/* ── Winner screen ── */}
       {auctionEnded && (
-        <div className="absolute inset-0 z-20 bg-black">
+        <div className="absolute inset-0 z-20">
           <WinnerScreen winner={state.winner} sounds={sounds} />
         </div>
       )}
