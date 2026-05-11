@@ -135,7 +135,7 @@ export default function DisplayClient() {
           loop
           muted
           playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-15 pointer-events-none z-0"
+          className="absolute inset-0 w-full h-full object-cover opacity-100 pointer-events-none z-0"
         >
           <source src="https://res.cloudinary.com/dpdzihcnp/video/upload/v1778495276/lionroar_i9cq3l.mp4" type="video/mp4" />
         </video>
@@ -145,7 +145,6 @@ export default function DisplayClient() {
       {showDefaultIdle && (
         <div className="absolute inset-0 z-10">
           {/* Reuse the same bg video at full opacity via overlay */}
-          <div className="absolute inset-0 bg-black/35" />
           {/* Placeholder auction text */}
           <div className="relative z-10 flex flex-col items-center justify-center h-full gap-6">
             <h1 className="text-5xl lg:text-6xl font-bold text-amber-400 tracking-wide">
