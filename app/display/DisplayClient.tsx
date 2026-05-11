@@ -33,6 +33,8 @@ export default function DisplayClient() {
   const [showBidFlash, setShowBidFlash] = useState(false);
   const bidFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevLeaderNameRef = useRef<string | null>(null);
+  // Persistent background video ref — never unmounts to avoid stutter
+  const bgVideoRef = useRef<HTMLVideoElement>(null);
   const sounds = useSoundEffects();
 
   useEffect(() => {
@@ -102,7 +104,8 @@ export default function DisplayClient() {
     };
   }, [sounds]);
 
-  const timerActive = state.timer.status !== "stopped";
+  const timerActive = state.timer.status === "running";
+  const timerVisible = state.timer.status !== "stopped";
   const auctionEnded = state.phase === "ended";
 
   // Screen 1: default start screen — no item set
@@ -124,21 +127,25 @@ export default function DisplayClient() {
   return (
     <div className="relative flex h-screen w-screen overflow-hidden bg-zinc-950 text-white">
 
+      {/* ── Single persistent background video — never unmounts to avoid stutter ── */}
+      {!auctionEnded && (
+        <video
+          ref={bgVideoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-15 pointer-events-none z-0"
+        >
+          <source src="https://res.cloudinary.com/dpdzihcnp/video/upload/v1778495276/lionroar_i9cq3l.mp4" type="video/mp4" />
+        </video>
+      )}
+
       {/* ── SCREEN 1: Default idle — background video + placeholder text ── */}
       {showDefaultIdle && (
         <div className="absolute inset-0 z-10">
-          {/* Background video */}
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="https://res.cloudinary.com/dpdzihcnp/video/upload/v1778326479/background1_ilc0v0.mp4" type="video/mp4" />
-          </video>
-          {/* Overlay so text is readable */}
-          <div className="absolute inset-0 bg-black/50" />
+          {/* Reuse the same bg video at full opacity via overlay */}
+          <div className="absolute inset-0 bg-black/35" />
           {/* Placeholder auction text */}
           <div className="relative z-10 flex flex-col items-center justify-center h-full gap-6">
             <h1 className="text-5xl lg:text-6xl font-bold text-amber-400 tracking-wide">
@@ -173,38 +180,28 @@ export default function DisplayClient() {
             )}
           </div>
 
-          {/* Right half — text with video background ONLY */}
+          {/* Right half — text with dark overlay */}
           <div className="w-1/2 h-full relative overflow-hidden">
-            {/* Background video for right section only */}
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover"
-            >
-              <source src="https://res.cloudinary.com/dpdzihcnp/video/upload/v1778326479/background1_ilc0v0.mp4" type="video/mp4" />
-            </video>
-            
             {/* Dark overlay for text readability */}
             <div className="absolute inset-0 bg-black/50" />
             
             {/* Text content */}
-            <div className="relative z-10 w-full h-full flex flex-col py-5 gap-6 px-8 lg:px-16">
+            <div className="relative z-10 mt-1 w-full h-full flex flex-col py-2 gap-3 px-1 lg:px-1">
               {state.item.hostedBy && (
-                <h1 className="text-4xl lg:text-5xl text-green-400 font-bold">
+                <h1 className="text-4xl lg:text-5xl p-2  text-green-400 font-bold border-2 border-green-400 rounded-xl">
                   {state.item.hostedBy}
                 </h1>
               )}
-              <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight">
+              <h1 className="text-4xl lg:text-6xl p-2 font-bold text-white border-2 border-white leading-tight rounded-xl">
                 {state.item.name}
               </h1>
-              <div className=" gap-1">
+              <div className=" gap-1 p-2 border-2 border-amber-400 rounded-xl">
                 <h3 className="text-4xl lg:text-6xl text-amber-400 mb-1">የጫራታው መነሻ ዋጋ :</h3>
                 <p className="text-4xl lg:text-5xl font-bold text-amber-400">
                   {state.item.startingPrice.toLocaleString()} ብር
                 </p>
               </div>
+              <h3 className="text-3xl lg:text-6xl text-white mb-1 border-2 border-white rounded-xl">ጫራታው ሊጀመር ነው!!! </h3>
             </div>
           </div>
         </div>
@@ -225,20 +222,8 @@ export default function DisplayClient() {
         </div>
       )}
 
-      {/* ── Main bidding layout (always rendered, background video behind it) ── */}
-      {!auctionEnded && (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-15 pointer-events-none z-0"
-        >
-          <source src="https://res.cloudinary.com/dpdzihcnp/video/upload/v1778326479/background1_ilc0v0.mp4" type="video/mp4" />
-        </video>
-      )}
-
       {/* ── Main bidding layout ── */}
+      {!auctionEnded && !showDefaultIdle && !showItemPreview && (
       <div
         className={`relative z-0 flex flex-1 flex-col overflow-hidden transition-all duration-300 ${
           state.sidebarVisible ? "mr-80" : ""
@@ -254,6 +239,7 @@ export default function DisplayClient() {
           <BidFeed bids={state.bids} />
         </div>
       </div>
+      )}
 
       {/* ── Item sidebar ── */}
       {state.sidebarVisible && (
@@ -263,12 +249,13 @@ export default function DisplayClient() {
       )}
 
       {/* ── Timer overlay ── */}
-      {timerActive && (
-        <div className="absolute inset-0 z-10">
+      {timerVisible && (
+        <div className={state.timer.status === "paused" ? "absolute top-0 left-0 right-0 z-20 flex justify-center" : "absolute inset-0 z-10"}>
           <TimerOverlay
             status={state.timer.status}
             remainingSeconds={state.timer.remainingSeconds}
             sounds={sounds}
+            leaderName={state.highestBid?.bidderName ?? null}
             onTimerEnd={() => setState((prev: AuctionState) => ({ ...prev, phase: "ended" }))}
           />
         </div>
@@ -276,7 +263,7 @@ export default function DisplayClient() {
 
       {/* ── Winner screen ── */}
       {auctionEnded && (
-        <div className="absolute inset-0 z-20">
+        <div className="absolute inset-0 z-20 bg-black">
           <WinnerScreen winner={state.winner} sounds={sounds} />
         </div>
       )}

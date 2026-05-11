@@ -36,21 +36,22 @@ export default function WinnerScreen({ winner, sounds, onReset }: WinnerScreenPr
     sounds.playFanfare();
 
     const burst = () => {
-      confetti({ particleCount: 20, spread: 40, angle: 60, origin: { x: 0, y: 0.6 }, scalar: 0.7, ticks: 80 });
-      confetti({ particleCount: 20, spread: 40, angle: 120, origin: { x: 1, y: 0.6 }, scalar: 0.7, ticks: 80 });
+      confetti({ particleCount: 12, spread: 35, angle: 60, origin: { x: 0, y: 0.6 }, scalar: 0.6, ticks: 60 });
+      confetti({ particleCount: 12, spread: 35, angle: 120, origin: { x: 1, y: 0.6 }, scalar: 0.6, ticks: 60 });
     };
 
     burst();
-    const t1 = setTimeout(() => burst(), 1800);
-    timeoutsRef.current.push(t1);
+    const t1 = setTimeout(() => burst(), 3000);
+    const t2 = setTimeout(() => burst(), 6000);
+    timeoutsRef.current.push(t1, t2);
 
     if (nameRef.current) {
       gsapCtxRef.current = gsap.context(() => {
         gsap
           .timeline()
-          .from(nameRef.current!, { scale: 0, duration: 0.5, ease: "back.out(1.7)" })
-          .to(nameRef.current!, { scale: 1.2, duration: 0.15, ease: "power2.out" })
-          .to(nameRef.current!, { scale: 1.0, duration: 0.15, ease: "power2.in" });
+          .from(nameRef.current!, { scale: 0, duration: 1.2, ease: "back.out(1.2)" })
+          .to(nameRef.current!, { scale: 1.05, duration: 0.4, ease: "power1.out" })
+          .to(nameRef.current!, { scale: 1.0, duration: 0.4, ease: "power1.in" });
       });
     }
 
@@ -69,20 +70,8 @@ export default function WinnerScreen({ winner, sounds, onReset }: WinnerScreenPr
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative flex flex-col items-center justify-center h-full w-full overflow-hidden"
+        className="relative flex flex-col items-center justify-center h-full w-full bg-zinc-950 overflow-hidden"
       >
-        {/* Background video */}
-        <video
-          key={videoSrc}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src={videoSrc} type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-black/60" />
         <div className="relative z-10 flex flex-col items-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -154,18 +143,28 @@ export default function WinnerScreen({ winner, sounds, onReset }: WinnerScreenPr
           <span>🏆</span>
         </motion.div>
 
-        {/* Winner name */}
-        <div
-          ref={nameRef}
-          className="font-bold text-white mb-8 text-center"
+       
+        {/* Winner name with spring bounce */}
+        <motion.div
+          className="font-bold text-white mb-8 text-center w-full break-words px-4"
           style={{
-            fontSize: "clamp(4rem, 12vw, 10rem)",
+            fontSize: "clamp(2rem, 8vw, 8rem)",
+            lineHeight: 1.1,
             filter: "drop-shadow(0 0 30px #fbbf24)",
-            willChange: "transform",
+            wordBreak: "break-word",
+            overflowWrap: "break-word",
+          }}
+          initial={{ scale: 0.5, opacity: 0, y: -100 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{
+            type: "spring",
+            damping: 12,
+            stiffness: 200,
+            mass: 1,
           }}
         >
           {winner.bidderName}
-        </div>
+        </motion.div>
 
         {/* Winning amount */}
         <motion.div
@@ -175,7 +174,7 @@ export default function WinnerScreen({ winner, sounds, onReset }: WinnerScreenPr
           className="space-y-2 text-center"
         >
           <p className="text-3xl text-zinc-300 uppercase tracking-wider">በከፍተኛ ፉክክር እና</p>
-          <p className="text-8xl font-bold text-amber-400">በ {formattedAmount} ብር</p>
+          <p className="text-5xl lg:text-8xl font-bold text-amber-400">በ {formattedAmount} ብር</p>
           <p className="text-3xl text-white tracking-wider">እንኳን ደስ አለዎ!!!</p>
         </motion.div>
 

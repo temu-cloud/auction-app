@@ -25,8 +25,14 @@ export default function TimerControls({
   const [duration, setDuration] = useState<number | ''>(60)
 
   function handleStart() {
-    if (!socket || duration === '' || duration <= 0) return
-    socket.emit('timer:start', { durationSeconds: Number(duration) })
+    if (!socket) return
+    if (isPaused) {
+      // Resume from where it was paused
+      socket.emit('timer:start', { durationSeconds: remainingSeconds })
+    } else {
+      if (duration === '' || duration <= 0) return
+      socket.emit('timer:start', { durationSeconds: Number(duration) })
+    }
   }
 
   function handlePause() {

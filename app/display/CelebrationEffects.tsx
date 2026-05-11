@@ -45,8 +45,8 @@ export default function CelebrationEffects({ trigger, onComplete }: CelebrationE
       }
       setParticles((prev) => [...prev, ...newParticles]);
     } else {
-      confetti({ particleCount: 30, spread: 45, angle: 60, origin: { x: 0, y: 0.5 }, scalar: 0.8, ticks: 120 });
-      confetti({ particleCount: 30, spread: 45, angle: 120, origin: { x: 1, y: 0.5 }, scalar: 0.8, ticks: 120 });
+      confetti({ particleCount: 18, spread: 40, angle: 60, origin: { x: 0, y: 0.5 }, scalar: 0.7, ticks: 80 });
+      confetti({ particleCount: 18, spread: 40, angle: 120, origin: { x: 1, y: 0.5 }, scalar: 0.7, ticks: 80 });
 
       const newParticles: EdgeParticle[] = [];
       for (let i = 0; i < 3; i++) {

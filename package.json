@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
+    "build": "NODE_OPTIONS=\"--max-old-space-size=2048\" prisma migrate deploy && next build",
     "start": "NODE_ENV=production NODE_OPTIONS=\"--max-old-space-size=2048\" tsx server.ts",
     "lint": "eslint",
     "test": "vitest --run",

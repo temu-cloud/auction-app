@@ -112,6 +112,7 @@ function triggerQuickExplosion() {
 export default function BidFeed({ bids }: BidFeedProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const prevBidsCountRef = useRef<number>(bids.length);
+  const userScrolledRef = useRef(false);
 
   // Take the last 50 bids and reverse so newest is at index 0
   const displayBids = useMemo(() => bids.slice(-50).reverse(), [bids]);
@@ -134,23 +135,29 @@ export default function BidFeed({ bids }: BidFeedProps) {
     };
   }, []);
 
+  // Detect manual scroll — if user scrolls away from top, stop auto-scrolling
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      userScrolledRef.current = el.scrollTop > 40;
+    };
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Trigger celebration on EVERY new bid
   useEffect(() => {
-    // Check if a new bid was added
     if (bids.length > prevBidsCountRef.current && bids.length > 0) {
-      // Trigger explosion
       triggerQuickExplosion();
-      // Trigger cheer sound
       playCheerSound();
     }
-    
-    // Update the ref for next comparison
     prevBidsCountRef.current = bids.length;
   }, [bids]);
 
-  // Auto-scroll to top (newest) on each bids update
+  // Auto-scroll to top (newest) only if user hasn't manually scrolled
   useEffect(() => {
-    if (scrollContainerRef.current) {
+    if (!userScrolledRef.current && scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;
     }
   }, [bids]);
@@ -162,7 +169,7 @@ export default function BidFeed({ bids }: BidFeedProps) {
     >
       {displayBids.length === 0 ? (
         <div className="flex items-center justify-center h-full text-white text-semibold text-2xl">
-          ይጫረቱ ያሸንፉ!!
+         
         </div>
       ) : (
         <AnimatePresence>

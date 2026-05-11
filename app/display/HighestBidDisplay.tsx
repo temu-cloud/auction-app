@@ -9,7 +9,7 @@ interface HighestBidDisplayProps {
 }
 
 export default function HighestBidDisplay({ highestBid, startingPrice }: HighestBidDisplayProps) {
-  const displayAmount = highestBid ? highestBid.amount : startingPrice;
+  const displayAmount = highestBid ? highestBid.amount : (startingPrice ?? 0);
   const label = highestBid ? "" : "";
 
   return (
@@ -30,7 +30,7 @@ export default function HighestBidDisplay({ highestBid, startingPrice }: Highest
         className="font-bold text-amber-400"
 style={{ fontSize: "min(20vh, clamp(3rem, 12vw, 10rem))" }}
       >
-        {displayAmount}
+        {displayAmount?.toLocaleString() ?? "0"}
       ብር
       </motion.div>
     </div>
