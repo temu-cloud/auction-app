@@ -29,6 +29,13 @@ export default function WinnerScreen({ winner, sounds, onReset }: WinnerScreenPr
   const [videoSrc] = useState(() =>
     WINNER_VIDEOS[Math.floor(Math.random() * WINNER_VIDEOS.length)]
   );
+  // Delay showing "No Winner" to avoid flashing it before winner data arrives
+  const [showNoWinner, setShowNoWinner] = useState(false);
+  useEffect(() => {
+    if (winner !== null) { setShowNoWinner(false); return; }
+    const t = setTimeout(() => setShowNoWinner(true), 800);
+    return () => clearTimeout(t);
+  }, [winner]);
 
   useEffect(() => {
     if (winner === null) return;
@@ -64,6 +71,7 @@ export default function WinnerScreen({ winner, sounds, onReset }: WinnerScreenPr
   }, [winner, sounds]);
 
   if (winner === null) {
+    if (!showNoWinner) return null;
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -122,15 +130,13 @@ export default function WinnerScreen({ winner, sounds, onReset }: WinnerScreenPr
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover brightness-125 contrast-110 saturate-150"
       >
         <source src={videoSrc} type="video/mp4" />
       </video>
-      {/* Dark overlay so text stays readable */}
-      <div className="absolute inset-0 bg-black/55" />
 
       {/* All content sits above the video */}
-      <div className="relative z-10 flex flex-col items-center w-full px-8">
+      <div className="relative z-10 flex flex-col items-center w-full px-8" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.9)" }}>
         {/* Trophy header */}
         <motion.div
           initial={{ y: -50, opacity: 0 }}
