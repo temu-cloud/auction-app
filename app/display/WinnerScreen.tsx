@@ -29,14 +29,6 @@ export default function WinnerScreen({ winner, sounds, onReset }: WinnerScreenPr
   const [videoSrc] = useState(() =>
     WINNER_VIDEOS[Math.floor(Math.random() * WINNER_VIDEOS.length)]
   );
-  // Delay showing "No Winner" to avoid flashing it before winner data arrives
-  const [showNoWinner, setShowNoWinner] = useState(false);
-  useEffect(() => {
-    if (winner !== null) { setShowNoWinner(false); return; }
-    const t = setTimeout(() => setShowNoWinner(true), 800);
-    return () => clearTimeout(t);
-  }, [winner]);
-
   useEffect(() => {
     if (winner === null) return;
 
@@ -71,46 +63,7 @@ export default function WinnerScreen({ winner, sounds, onReset }: WinnerScreenPr
   }, [winner, sounds]);
 
   if (winner === null) {
-    if (!showNoWinner) return null;
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative flex flex-col items-center justify-center h-full w-full bg-zinc-950 overflow-hidden"
-      >
-        <div className="relative z-10 flex flex-col items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            className="text-7xl font-bold text-zinc-400 text-center"
-          >
-            No Winner
-          </motion.div>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="mt-6 text-2xl text-zinc-500"
-          >
-            The auction ended with no bids.
-          </motion.p>
-          {onReset && (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8, duration: 0.4 }}
-              onClick={onReset}
-              className="mt-10 px-8 py-3 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white text-xl font-semibold transition-colors"
-            >
-              Start New Auction
-            </motion.button>
-          )}
-        </div>
-      </motion.div>
-    );
+    return null;
   }
 
   const formattedAmount = new Intl.NumberFormat().format(winner.amount);
@@ -136,25 +89,24 @@ export default function WinnerScreen({ winner, sounds, onReset }: WinnerScreenPr
       </video>
 
       {/* All content sits above the video */}
-      <div className="relative z-10 flex flex-col items-center w-full px-8" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.9)" }}>
+      <div className="relative z-10 flex flex-col items-center w-full px-4 sm:px-8" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.9)" }}>
         {/* Trophy header */}
         <motion.div
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="text-7xl font-bold text-amber-400 mb-10 flex items-center space-x-6"
+          className="text-5xl sm:text-6xl lg:text-7xl font-bold text-amber-400 mb-4 sm:mb-10 flex items-center space-x-3 sm:space-x-6"
         >
-          <Trophy size={80} className="text-yellow-500" />
-          <span>የጫራታው አሸናፊ!</span>
+          <Trophy size={48} className="text-yellow-500 sm:w-20 sm:h-20" />
+          <span >የጫራታው አሸናፊ!</span>
           <span>🏆</span>
         </motion.div>
 
-       
         {/* Winner name with spring bounce */}
         <motion.div
-          className="font-bold text-white mb-8 text-center w-full break-words px-4"
+          className="font-bold text-white mb-4 sm:mb-8 text-center w-full break-words px-2 sm:px-4"
           style={{
-            fontSize: "clamp(2rem, 8vw, 8rem)",
+            fontSize: "clamp(1.8rem, 7vw, 8rem)",
             lineHeight: 1.1,
             filter: "drop-shadow(0 0 30px #fbbf24)",
             wordBreak: "break-word",
@@ -162,12 +114,7 @@ export default function WinnerScreen({ winner, sounds, onReset }: WinnerScreenPr
           }}
           initial={{ scale: 0.5, opacity: 0, y: -100 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{
-            type: "spring",
-            damping: 12,
-            stiffness: 200,
-            mass: 1,
-          }}
+          transition={{ type: "spring", damping: 12, stiffness: 200, mass: 1 }}
         >
           {winner.bidderName}
         </motion.div>
@@ -177,11 +124,11 @@ export default function WinnerScreen({ winner, sounds, onReset }: WinnerScreenPr
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.9, duration: 0.6 }}
-          className="space-y-2 text-center"
+          className="space-y-1 sm:space-y-2 text-center"
         >
-          <p className="text-3xl text-zinc-300 uppercase tracking-wider">በከፍተኛ ፉክክር እና</p>
-          <p className="text-5xl lg:text-8xl font-bold text-amber-400">በ {formattedAmount} ብር</p>
-          <p className="text-3xl text-white tracking-wider">እንኳን ደስ አለዎ!!!</p>
+          <p className="text-xl sm:text-3xl text-zinc-300 uppercase tracking-wider">በከፍተኛ ፉክክር እና</p>
+          <p className="text-3xl sm:text-5xl lg:text-8xl font-bold text-amber-400">በ {formattedAmount} ብር</p>
+          <p className="text-xl sm:text-3xl text-white tracking-wider">እንኳን ደስ አለዎ!!!</p>
         </motion.div>
 
         {/* Decorative sparkles */}

@@ -30,7 +30,7 @@ export default function LoginPage() {
     }
 
     if (data) {
-      router.push('/control')
+      window.location.href = '/control'
     }
   }
 

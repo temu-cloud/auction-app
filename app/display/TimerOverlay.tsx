@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { TimerStatus } from "@/lib/auction-state";
 import { SoundEffects } from "@/app/display/hooks/useSoundEffects";
+import { Trophy } from "lucide-react";
 
 interface TimerOverlayProps {
   status: TimerStatus;
@@ -130,7 +131,14 @@ export default function TimerOverlay({
 
   // Running — full overlay
   return (
-    <div className="flex flex-col items-center justify-center h-full w-full bg-gradient-to-br from-zinc-950 via-zinc-950 to-black relative">
+    <div className="flex flex-col items-center justify-center h-full w-full relative overflow-hidden">
+      {/* Timer background video */}
+      <video
+        autoPlay loop muted playsInline
+        className="absolute inset-0 w-full h-full object-cover brightness-125 contrast-110 saturate-150 pointer-events-none"
+      >
+        <source src="https://res.cloudinary.com/dpdzihcnp/video/upload/v1778685949/time_jkt7ii.mp4" type="video/mp4" />
+      </video>
       <div
         ref={vignetteRef}
         className="fixed inset-0 pointer-events-none z-20"
@@ -138,25 +146,30 @@ export default function TimerOverlay({
       />
 
       {leaderName && (
-        <div className="text-2xl font-bold text-zinc-300 mb-4 tracking-wide">
+        <div className="relative items-center justify-center z-10 text-5xl sm:text-5xl font-bold text-green-400 mb-2 sm:mb-4 tracking-wide"
+             style={{ textShadow: "0 2px 12px rgba(0,0,0,0.9)" }}>
+              <span><Trophy size={48} className="text-yellow-500 mx-auto sm:w-20 sm:h-20" /></span>
+              
            {leaderName}
         </div>
       )}
 
-      <div className="text-3xl font-semibold text-zinc-400 uppercase tracking-wider mb-8">
+      <div className="relative z-10 text-xl sm:text-2xl lg:text-5xl font-bold text-red-400 uppercase tracking-wider mb-4 sm:mb-8"
+           style={{ textShadow: "0 2px 12px rgba(0,0,0,0.9)" }}>
         ጨረታው ሊዘጋ የቀረው ሰዓት
       </div>
 
       <div
         ref={timerRef}
-        className="font-bold"
-        style={{ fontSize: "clamp(6rem, 20vw, 16rem)", color: "#f59e0b", opacity: 1 }}
+        className="relative z-10 font-bold"
+        style={{ fontSize: "clamp(4rem, 18vw, 16rem)", color: "#f59e0b", opacity: 1, textShadow: "0 4px 24px rgba(0,0,0,0.95)" }}
       >
         {formattedTime}
       </div>
 
       {Math.floor(remainingSeconds) <= 10 && remainingSeconds > 0 && (
-        <div className="text-4xl font-bold text-red-400 mt-8 uppercase tracking-widest">
+        <div className="relative z-10 text-xl sm:text-4xl lg:text-5xl font-bold text-red-400 mt-4 sm:mt-8 uppercase tracking-widest"
+             style={{ textShadow: "0 2px 12px rgba(0,0,0,0.9)" }}>
           የመጨረሻ እድል ይሞክሩ !
         </div>
       )}
