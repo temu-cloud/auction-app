@@ -11,6 +11,7 @@ import BidForm from './BidForm'
 import TimerControls from './TimerControls'
 import DisplayPreview from './DisplayPreview'
 import UserRoleManager from './UserRoleManager'
+import AuctionHistoryModal from './AuctionHistoryModal'
 
 interface ControlClientProps {
   user: { id: string; name: string; email: string; role: string }
@@ -30,6 +31,7 @@ export default function ControlClient({ user }: ControlClientProps) {
   const [connected, setConnected] = useState(false)
   const [auctionState, setAuctionState] = useState<AuctionState>(DEFAULT_STATE)
   const [startingAuction, setStartingAuction] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -107,6 +109,8 @@ export default function ControlClient({ user }: ControlClientProps) {
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col">
       <Toaster position="top-right" toastOptions={{ style: { background: '#18181b', color: '#f4f4f5', border: '1px solid #3f3f46' } }} />
 
+      {showHistory && <AuctionHistoryModal onClose={() => setShowHistory(false)} />}
+
       {/* Header */}
       <header className="flex items-center justify-between px-3 py-2 bg-zinc-900 border-b border-zinc-800 shrink-0 gap-2">
         <div className="hidden lg:block w-40" />
@@ -122,6 +126,7 @@ export default function ControlClient({ user }: ControlClientProps) {
         </div>
         <div className="flex items-center gap-2">
           <Link href="/display" className="text-xs text-zinc-400 hover:text-zinc-200 whitespace-nowrap">→ Display</Link>
+          <button onClick={() => setShowHistory(true)} className="text-xs text-zinc-400 hover:text-amber-400 px-2 py-1 rounded border border-zinc-700 whitespace-nowrap">📋 History</button>
           <p className="text-xs text-zinc-400 hidden sm:block truncate max-w-24">{user.name}</p>
           <button onClick={handleSignOut} className="text-xs text-zinc-500 hover:text-red-400 px-2 py-1 rounded border border-zinc-700 whitespace-nowrap">Sign Out</button>
         </div>
